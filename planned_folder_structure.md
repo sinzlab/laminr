@@ -8,10 +8,12 @@
 │   │   ├── inr.py
 │   │   ├── coordinate_transforms.py
 │   │   ├── 📂 neuron_models/
+│   │   │   ├── __init__.py
 │   │   │   ├── monkey.py
 │   │   │   ├── synthetic.py
 │   │   │   ├── utils.py
 │   │   ├── 📂 utils/
+│   │   │   ├── __init__.py
 │   │   │   ├── img_transforms.py
 │   │   │   ├── img_similarity_metrics.py
 │   │   │   ├── grid_generator.py
