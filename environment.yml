@@ -1,0 +1,22 @@
+name: laminr
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python==3.9
+  - numpy==1.26.4
+  - matplotlib==3.4.3
+  - pandas
+  - scikit-learn
+  - scikit-image
+  - seaborn
+  - ipython
+  - jupyter
+  - jupyterlab
+  - ipdb
+  - tqdm
+  - pip
+  - pip:
+      - lipstick
+      - torch==1.13.1
+      - git+https://github.com/lucabaroni/featurevis_mod

@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Bashiri"
+  given-names: "Mohammad"
+- family-names: "Baroni"
+  given-names: "Luca"
+- family-names: "Antolík"
+  given-names: "Ján"
+- family-names: "Sinz"
+  given-names: "Fabian"
+title: "Learning and Aligning Single-Neuron Invariance Manifolds in Visual Cortex"
+version: 0.0.1
+doi: https://openreview.net/forum?id=kbjJ9ZOakb
+date-released: 2025-03-01
+url: "https://github.com/mohammadbashiri/laminr"

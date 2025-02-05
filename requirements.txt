@@ -1,0 +1,14 @@
+numpy==1.26.4
+matplotlib==3.4.3
+pandas
+scikit-learn
+scikit-image
+seaborn
+ipython
+jupyter
+jupyterlab
+ipdb
+tqdm
+torch==1.13.1
+lipstick
+git+https://github.com/lucabaroni/featurevis_mod

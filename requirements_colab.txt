@@ -1,0 +1,2 @@
+lipstick
+git+https://github.com/lucabaroni/featurevis_mod

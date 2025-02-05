@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "laminr"
+version = "0.0.2"
+description = "Learning and Aligning Manifolds using Implicit Neural Representations."
+authors = [
+    {name = "Mohammad Bashiri", email = "mohammadbashiri93@gmail.com"},
+    {name = "Luca Baroni", email = "loocabaroni@gmail.com"},
+]
+license = { file = "LICENSE" }
+dependencies = []
+
+[tool.setuptools]
+packages = ["laminr"]
+package-dir = { "" = "src" }
