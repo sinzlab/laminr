@@ -74,7 +74,7 @@ For commercial use inquiries, please contact: mohammadbashiri93@gmail.com.
 
 ## 📖 Paper
 
-**ICLR 2025** (\<PRESENTATION FORMAT\>): ["Learning and Aligning Single-Neuron Invariance Manifolds in Visual Cortex"](https://openreview.net/forum?id=kbjJ9ZOakb) <br>
+**ICLR 2025** (\<PRESENTATION FORMAT\>): [Learning and Aligning Single-Neuron Invariance Manifolds in Visual Cortex](https://openreview.net/forum?id=kbjJ9ZOakb) <br>
 **Authors**: Mohammad Bashiri*, Luca Baroni*, Ján Antolík, Fabian H. Sinz. (* denotes equal contribution)
 
 Please cite our work if you find it useful:
