@@ -90,8 +90,8 @@ Please cite our work if you find it useful:
 
 ## 📝 To-Do
 
-- [ ] Add full documentation
-- [ ] Provide pretrained models
+- [ ] Add necessary amount of documentation (not too much, but also not nothing)
+- [x] Provide pretrained models
 - [ ] Add a link to google colab for running the quick start example
 - [ ] Add some light-weight gifs (optional - we need to make sure the git repo is as light-weight as possible)
 - [ ] Include a web-based visualization tool for invariance manifolds (optional)
