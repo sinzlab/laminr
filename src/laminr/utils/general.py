@@ -1,7 +1,7 @@
 from torch import nn
 
 
-class single_cell_model(nn.Module):
+class SingleCellModel(nn.Module):
     def __init__(self, model, idx):
         super().__init__()
         self.model = model
