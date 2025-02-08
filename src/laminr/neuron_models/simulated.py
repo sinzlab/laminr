@@ -1,5 +1,5 @@
 import numpy as np
-from .utils import (
+from .utils.simulated_model import (
     sigmoid,
     generate_gabor_filter,
     ArbitraryNeuronModel,

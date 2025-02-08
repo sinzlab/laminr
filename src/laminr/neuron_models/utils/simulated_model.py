@@ -29,16 +29,6 @@ class ArbitraryMultiNeuronModel(nn.Module):
         return torch.stack(preds, dim=1)
 
 
-class single_cell_model(nn.Module):
-    def __init__(self, model, idx):
-        super().__init__()
-        self.model = model
-        self.idx = idx
-
-    def forward(self, x):
-        return self.model(x)[:, self.idx].squeeze()
-
-
 class ComplexCell(nn.Module):
     def __init__(self, even_filter_np, odd_filter_np):
         super(ComplexCell, self).__init__()

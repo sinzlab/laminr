@@ -2,7 +2,7 @@ import warnings
 import numpy as np
 import torch
 import torch.nn as nn
-from laminr.neuron_models.monkey_model_utils import (
+from .utils.monkey_model import (
     se_core_full_gauss_readout,
     se_core_point_readout,
 )
