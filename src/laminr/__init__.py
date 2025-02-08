@@ -1,1 +1,1 @@
-# Placeholder for package laminr
+from . import neuron_models
