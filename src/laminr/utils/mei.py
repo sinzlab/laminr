@@ -67,7 +67,6 @@ def generate_mei(
     mask, mask_center = create_mask(
         mei.mean(dim=0), return_mask_centroid=True, zscore_thresh=zscore
     )
-    mask = mask.unsqueeze(0).repeat(channels, 1, 1)
 
     return mei.cpu().data.numpy(), mei_act, mask.cpu().data.numpy(), mask_center
 

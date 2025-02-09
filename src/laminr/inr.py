@@ -238,6 +238,7 @@ class INRTemplates(nn.Module):
         uniform_scale,
         clamp_boundaries,
     ):
+        device = next(self.parameters()).device
         self.num_neurons = num_neurons
         self.coordinate_transform = CoordinateTransform(
             self.num_neurons,
@@ -247,7 +248,7 @@ class INRTemplates(nn.Module):
             allow_scale=allow_scale,
             allow_shear=allow_shear,
             uniform_scale=uniform_scale,
-        )
+        ).to(device)
         self.coordinate_transform_clamp_boundaries = clamp_boundaries
 
     def reset_coordinate_transform(self, num_neurons=None):

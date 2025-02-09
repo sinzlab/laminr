@@ -79,3 +79,24 @@ class ParamReduceOnPlateau:
             value_to_reduce = value_to_reduce * self.factor
             self.num_epochs_no_improvement = 0
         return value_to_reduce
+
+
+class ImprovementChecker:
+    def __init__(self, patience=5, ignore_diff_smaller_than=1e-3):
+        self.current_value = np.nan
+        self.iter = 0
+        self.has_not_improved_counter = 0
+        self.patience = patience
+        self.ignore_diff_smaller_than = ignore_diff_smaller_than
+
+    def is_increasing(self, value):
+        if self.iter == 0:
+            self.current_value = value
+            self.iter += 1
+        else:
+            if value <= self.current_value + self.ignore_diff_smaller_than:
+                self.has_not_improved_counter += 1
+            else:
+                self.has_not_improved_counter = 0
+                self.current_value = value
+        return False if self.has_not_improved_counter == self.patience else True
