@@ -56,9 +56,9 @@ For a more detailed walkthrough, see our [examples](examples).
 
 ## 🛠 Questions & Contributions
 
-If you encounter any issues while using the method, please create an [Issue](https://github.com/your-org/laminr/issues) on GitHub.
+If you encounter any issues while using the method, please create an [Issue](https://github.com/sinzlab/laminr/issues) on GitHub.
 
-We welcome and appreciate contributions to the package! Feel free to open an [issue](https://github.com/your-org/laminr/issues) or submit a [pull request](https://github.com/your-org/laminr/pulls) for new features.
+We welcome and appreciate contributions to the package! Feel free to open an [Issue](https://github.com/sinzlab/laminr/issues) or submit a [Pull Request](https://github.com/sinzlab/laminr/pulls) for new features.
 
 For other questions or project collaboration inquiries, please contact mohammadbashiri93@gmail.com or loocabaroni@gmail.com.
 
