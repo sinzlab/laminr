@@ -12,11 +12,9 @@ class SingleNeuronModel(nn.Module):
         return self.model(x)[:, self.idx].squeeze()
 
 
-def resolve_device():
-    if torch.cuda.is_available():
-        device = "cuda"
-    elif torch.backends.mps.is_available():
-        device = "mps"
-    else:
-        device = "cpu"
-    return device
+def infer_device(module):
+    for param in module.parameters():
+        return param.device
+    for buffer in module.buffers():
+        return buffer.device
+    return torch.device("cpu")

@@ -252,7 +252,7 @@ class INRTemplates(nn.Module):
         self.coordinate_transform_clamp_boundaries = clamp_boundaries
 
     def reset_coordinate_transform(self, num_neurons=None):
-        device = next(self.parameters()).device
+        device = next(self.parameters()).device #TODO: use infer_device
         if num_neurons is not None:
             self.num_neurons = num_neurons
         else:

@@ -1,5 +1,6 @@
 import numpy as np
 from .utils.simulated_model import (
+    ArbitraryMultiNeuronModel,
     sigmoid,
     generate_gabor_filter,
     ArbitraryNeuronModel,
@@ -70,7 +71,7 @@ def neuron1_generator(loc, img_res, transformation_matrix=None, unit_norm=True):
     return ArbitraryNeuronModel(np.stack(filters)), grid
 
 
-def neuron2_generator(loc, img_res, transformation_matrix=None, unit_norm=True):
+def neuron2_generator(loc, img_res, transformation_matrix=None, unit_norm=True, num_filters=30):
     sigma_x = 0.11
     sigma_y = 0.15
     sf = 3
@@ -82,7 +83,7 @@ def neuron2_generator(loc, img_res, transformation_matrix=None, unit_norm=True):
     gabor_locs = np.array([[-0.09, 0.01], [-0.01, -0.05], [0.11, 0.04]]) + loc
 
     filters = []
-    for x in np.linspace(0, 2 * np.pi * periods, periods * 30):
+    for x in np.linspace(0, 2 * np.pi * periods, periods * num_filters):
         scale1 = (np.sin(x) + 1) / 2 * drange + min_val
         scale2 = (np.sin(x + np.pi / 3) + 1) / 2 * drange + min_val
         scale3 = (np.sin(x + np.pi / 3 * 2) + 1) / 2 * drange + min_val
@@ -138,7 +139,7 @@ def neuron2_generator(loc, img_res, transformation_matrix=None, unit_norm=True):
     return ArbitraryNeuronModel(np.stack(filters)), grid
 
 
-def neuron3_generator(loc, img_res, transformation_matrix=None, unit_norm=True):
+def neuron3_generator(loc, img_res, transformation_matrix=None, unit_norm=True, num_filters=15):
     sigma_x = 0.13
     sigma_y = 0.13
     sf = 2.5
@@ -154,7 +155,7 @@ def neuron3_generator(loc, img_res, transformation_matrix=None, unit_norm=True):
         * 0.7
         + loc
     )
-    n_points = 15
+    n_points = num_filters
     invariance_axis = np.concatenate(
         [np.linspace(0, 2 * np.pi, n_points)] * len(gabor_locs)
     )
@@ -373,3 +374,21 @@ def complex_neuron_generator(loc, img_res, transformation_matrix=None, unit_norm
     grid = xx, yy
 
     return ComplexCell(gb1, gb2), grid
+
+
+
+def simulated(model_type="demo1", img_res=[100, 100]):
+
+    if model_type == "demo1":
+        loc = [0.2, .2]
+        neuron_model1, _ = phase_invariant_neuron_generator(loc, img_res, num_filters=20)
+        loc = [-0.2, -.2]
+        t_mat = np.array([[0.70710678, -0.70710678], [0.70710678,  0.70710678]])
+        neuron_model2, _ = phase_invariant_neuron_generator(loc, img_res, transformation_matrix=t_mat, num_filters=20)
+        loc = [-0.2, .2]
+        # neuron_model3, _ = neuron3_generator(loc, img_res)
+        neuron_model3, _ = neuron2_generator(loc, img_res, num_filters=60)
+        return ArbitraryMultiNeuronModel([neuron_model1, neuron_model2, neuron_model3])
+    
+    else:
+        raise ValueError(f"Model type {model_type} does not exist.")

@@ -3,12 +3,12 @@ import featurevis
 import featurevis.ops as ops
 from featurevis.utils import Compose
 from .mask import create_mask
-from .general import SingleNeuronModel, resolve_device
+from .general import SingleNeuronModel, infer_device
 
 
 def generate_mei(
     model,
-    img_res,
+    input_shape,
     pixel_min,
     pixel_max,
     std=None,
@@ -30,7 +30,7 @@ def generate_mei(
     mean = (pixel_min + pixel_max) / 2
 
     # get image to optimize
-    initial_image = torch.randn(1, 1, *img_res, dtype=torch.float32).to(device) + mean
+    initial_image = torch.randn(1, *input_shape, dtype=torch.float32).to(device) + mean
 
     if std is not None:
         change_stats_transform = ops.ChangeStats(std=std, mean=mean)
@@ -73,12 +73,12 @@ def generate_mei(
 
 def get_mei_dict(
     response_predicting_model,
-    neuron_idxs,
     input_shape,
-    required_pixel_min,
-    required_pixel_max,
-    required_std=None,
-    required_norm=None,
+    pixel_value_lower_bound,
+    pixel_value_upper_bound,
+    neuron_idxs=None,
+    required_img_std=None,
+    required_img_norm=None,
     gb=None,
     zscore=0.3,  # TODO: think more about this (either user needs to specify this or we need to find a way to calculate this based on other params)
     step_size=10,
@@ -87,21 +87,24 @@ def get_mei_dict(
     device=None,
 ):
     if device is None:
-        device = resolve_device()
+        device = infer_device(response_predicting_model)
 
-    channels, height, width = input_shape
-    img_res = (height, width)
+    if neuron_idxs is None:
+        initial_image = torch.randn(1, *input_shape, dtype=torch.float32).to(device)
+        temp_out = response_predicting_model(initial_image)
+        neuron_idxs = list(range(temp_out.shape[1]))
+
     meis_dict = {}
     for idx, neuron_idx in enumerate(neuron_idxs):
         print(f"neuron_idx = {neuron_idx}: neuron number {idx}/{len(neuron_idxs)}")
         model = SingleNeuronModel(response_predicting_model, neuron_idx).to(device)
         mei, mei_act, mask, mask_center = generate_mei(
             model,
-            img_res,
-            std=required_std,
-            norm=required_norm,
-            pixel_min=required_pixel_min,
-            pixel_max=required_pixel_max,
+            input_shape,
+            std=required_img_std,
+            norm=required_img_norm,
+            pixel_min=pixel_value_lower_bound,
+            pixel_max=pixel_value_upper_bound,
             gb=gb,
             zscore=zscore,
             step_size=step_size,

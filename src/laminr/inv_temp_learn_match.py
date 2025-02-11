@@ -16,7 +16,7 @@ from .utils.training import (
 )
 from .utils.img_transforms import StandardizeClip, FixEnergyNormClip
 from .utils.mask import apply_mask
-from .utils.general import SingleNeuronModel, resolve_device
+from .utils.general import SingleNeuronModel, infer_device
 # from .utils.mei import check_meis
 
 
@@ -40,8 +40,8 @@ class InvarianceManifold:
         # Optimization config
         required_img_norm=None,
         required_img_std=None,
-        required_img_pixel_min=None,
-        required_img_pixel_max=None,
+        pixel_value_lower_bound=None,
+        pixel_value_upper_bound=None,
     ):
         # check that input argument are there and valid
         if required_img_std is None and required_img_norm is None:
@@ -74,15 +74,15 @@ class InvarianceManifold:
         self.periodic_invariance = periodic_invariance
 
         if device is None:
-            device = resolve_device()
+            device = infer_device(response_predicting_model)
 
         self.template = INRTemplates(**template_config).to(device)
 
         # check_meis() #TODO: implement this function
         self.meis_dict = meis_dict
 
-        self.pixel_min = required_img_pixel_min
-        self.pixel_max = required_img_pixel_max
+        self.pixel_min = pixel_value_lower_bound
+        self.pixel_max = pixel_value_upper_bound
         std = required_img_std
         norm = required_img_norm
         mean = (self.pixel_min + self.pixel_max) / 2
@@ -155,7 +155,7 @@ class InvarianceManifold:
         )
 
         if requirements is None:
-            requirements = dict(avg=0.9, std=1.0, necessary_min=0.85)
+            requirements = dict(avg=.99, std=1., necessary_min=0.98)
 
         optimizer = torch.optim.Adam(self.template.func.parameters(), lr=lr)
         pbar = tqdm(
@@ -228,7 +228,22 @@ class InvarianceManifold:
             )
 
         self.template.eval()
-        return self.template
+
+        with torch.no_grad():
+            img_pre, img_post, _acts, _ = self.forward(
+                grid,
+                self.template,
+                self.img_transforms,
+                template_neuron_model,
+                return_template=True,
+                gb=gaussian_blur,
+            )
+            acts = _acts / template_mei_act
+
+        images_on_template_manifold = img_post.cpu().data.numpy()
+        template_neuron_activations = _acts.squeeze().cpu().data.numpy()
+
+        return images_on_template_manifold, template_neuron_activations
 
     def match(
         self,
@@ -323,8 +338,8 @@ class InvarianceManifold:
                     other_neurons_loc_in_list=other_neurons_loc_in_list,
                     other_neurons_loc_in_model=other_neurons_loc_in_model,
                 )
-                relevant_acts = torch.diag(_acts.mean(dim=1))
-                acts = relevant_acts / others_mei_act
+                relevant_acts = _acts[range(len(self.target_neuron_idxs)), :, range(len(self.target_neuron_idxs))]
+                acts = relevant_acts.mean(dim=1) / others_mei_act
                 loss = -acts.mean()
                 optimizer.zero_grad()
                 loss.backward()
@@ -339,7 +354,23 @@ class InvarianceManifold:
                 break
 
         template.eval()
-        return template
+
+        with torch.no_grad():
+            img_pre, img_post, _acts, _ = self.forward(
+                input_grid,
+                template,
+                self.img_transforms,
+                self.response_predicting_model,
+                return_template=False,
+                other_neurons_loc_in_list=other_neurons_loc_in_list,
+                other_neurons_loc_in_model=other_neurons_loc_in_model,
+            )
+            relevant_acts = _acts[range(len(self.target_neuron_idxs)), :, range(len(self.target_neuron_idxs))]
+
+        images_on_aligned_manifolds = img_post.cpu().data.numpy()
+        target_neurons_activations = relevant_acts.cpu().data.numpy()
+
+        return images_on_aligned_manifolds, target_neurons_activations
 
     def save_learned_template_as_gif(self, n_images=20, name=None, cmap='Greys_r'):
         images_from_learned_template = self.get_images_from_learned_template(n_images=n_images)
@@ -537,7 +568,9 @@ class InvarianceManifold:
 
                         img_pre, img_post, _acts, _ = self.forward(input_grid, template, img_transforms, encoding_model, return_template=False, 
                                                             other_neurons_loc_in_list=other_neurons_loc_in_list, other_neurons_loc_in_model=other_neurons_loc_in_model)
-                        relevant_acts = torch.diag(_acts.mean(dim=1)).cpu().data.numpy()  # Get activations for each neuron
+                        # relevant_acts = torch.diag(_acts.mean(dim=1)).cpu().data.numpy()  # Get activations for each neuron
+                        relevant_acts = _acts[range(len(self.target_neuron_idxs)), :, range(len(self.target_neuron_idxs))]
+                        relevant_acts = relevant_acts.mean(dim=1).cpu().data.numpy()
 
                         # Store activations in the 4D array
                         activations_for_transformations[i, j, k, :] = relevant_acts
