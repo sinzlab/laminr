@@ -27,7 +27,7 @@ pip install laminr
 
 ### 2️⃣ Via GitHub (Latest Version)
 ```bash
-pip install git+https://github.com/your-org/laminr.git
+pip install git+https://github.com/sinzlab/laminr.git
 ```
 
 ## 🔥 Quick Start

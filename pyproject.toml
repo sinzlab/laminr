@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "laminr"
-version = "0.0.2"
+version = "0.0.3"
 description = "Learning and Aligning Manifolds using Implicit Neural Representations."
 authors = [
     {name = "Mohammad Bashiri", email = "mohammadbashiri93@gmail.com"},
