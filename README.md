@@ -35,24 +35,30 @@ pip install git+https://github.com/your-org/laminr.git
 Here's a simple example of how to use **LAMINR** to learn and align invariance manifolds.
 
 ```python
-import laminr
+device = "cuda"
+input_shape = [1, 100, 100] # channels, height, width
 
 # Load a trained response-predicting model
-model = laminr.load_model("macaque_v1")
+from laminr import neuron_models
+model = neuron_models.simulated("demo1", img_res=input_shape[1:]).to(device)
 
-# Select neurons of interest
-neuron1, neuron2 = model.get_neurons(42, 73)
+# Generate MEIs for the neurons
+from laminr import get_mei_dict
+image_stat_req = {"pixel_value_lower_bound": -1, "pixel_value_upper_bound": 1, "required_img_norm": 1}
+meis_dict = get_mei_dict(model, input_shape, **image_stat_req)
 
-# Learn the invariance manifold for neuron1
-manifold1 = laminr.learn_invariance_manifold(neuron1)
+# initialize the invariance learning and matching pipeline
+from laminr import InvarianceManifold
+invariance_manifold = InvarianceManifold(model, meis_dict, **image_stat_req)
 
-# Align with neuron2 to quantify shared invariance properties
-alignment_score, transformed_manifold = laminr.align_manifolds(manifold1, neuron2)
+# Learn the invariance manifold for neuron 0 (i.e. template manifold)
+template_neuron_idx = 0
+images_on_template_manifold, template_neuron_activations = invariance_manifold.learn(template_neuron_idx)
 
-print(f"Alignment Score: {alignment_score:.3f}")
+# Align the template to neurons 1 and 2
+target_neuron_idxs = [1, 2]
+images_on_aligned_manifolds, target_neurons_activations = invariance_manifold.match(target_neuron_idxs)
 ```
-
-For a more detailed walkthrough, see our [examples](examples).
 
 ## 🛠 Questions & Contributions
 
@@ -87,11 +93,3 @@ Please cite our work if you find it useful:
   year={2025}
 }
 ```
-
-## 📝 To-Do
-
-- [ ] Add necessary amount of documentation (not too much, but also not nothing)
-- [x] Provide pretrained models
-- [ ] Add a link to google colab for running the quick start example
-- [ ] Add some light-weight gifs (optional - we need to make sure the git repo is as light-weight as possible)
-- [ ] Include a web-based visualization tool for invariance manifolds (optional)
