@@ -16,7 +16,7 @@
   <img src="assets/method.png" alt="Method Overview" width="90%">
 </div>
 
-## 🛠 Installation
+## 🛠 Installation (still working on it)
 
 You can install LAMINR using one of the following methods:
 
