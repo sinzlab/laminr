@@ -57,11 +57,11 @@ inv_manifold = InvarianceManifold(model, meis_dict, **image_stat_req)
 
 # Learn the invariance manifold for neuron 0 (i.e. template manifold)
 template_neuron_idx = 0
-images_on_template_manifold, template_neuron_activations = inv_manifold.learn(template_neuron_idx)
+imgs_on_template_manifold, template_neuron_activations = inv_manifold.learn(template_neuron_idx)
 
 # Align the template to neurons 1 and 2
 target_neuron_idxs = [1, 2]
-images_on_aligned_manifolds, target_neurons_activations = inv_manifold.match(target_neuron_idxs)
+imgs_on_aligned_manifolds, target_neurons_activations = inv_manifold.match(target_neuron_idxs)
 ```
 
 ## 🛠 Questions & Contributions
