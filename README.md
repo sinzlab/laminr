@@ -44,20 +44,24 @@ model = neuron_models.simulated("demo1", img_res=input_shape[1:]).to(device)
 
 # Generate MEIs for the neurons
 from laminr import get_mei_dict
-image_stat_req = {"pixel_value_lower_bound": -1, "pixel_value_upper_bound": 1, "required_img_norm": 1}
+image_stat_req = {
+  "pixel_value_lower_bound": -1,
+  "pixel_value_upper_bound": 1,
+  "required_img_norm": 1,
+}
 meis_dict = get_mei_dict(model, input_shape, **image_stat_req)
 
 # initialize the invariance learning and matching pipeline
 from laminr import InvarianceManifold
-invariance_manifold = InvarianceManifold(model, meis_dict, **image_stat_req)
+inv_manifold = InvarianceManifold(model, meis_dict, **image_stat_req)
 
 # Learn the invariance manifold for neuron 0 (i.e. template manifold)
 template_neuron_idx = 0
-images_on_template_manifold, template_neuron_activations = invariance_manifold.learn(template_neuron_idx)
+images_on_template_manifold, template_neuron_activations = inv_manifold.learn(template_neuron_idx)
 
 # Align the template to neurons 1 and 2
 target_neuron_idxs = [1, 2]
-images_on_aligned_manifolds, target_neurons_activations = invariance_manifold.match(target_neuron_idxs)
+images_on_aligned_manifolds, target_neurons_activations = inv_manifold.match(target_neuron_idxs)
 ```
 
 ## 🛠 Questions & Contributions
