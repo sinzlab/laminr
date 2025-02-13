@@ -1,7 +1,0 @@
-tqdm
-torch==1.13.1
-numpy==1.26.4
-huggingface_hub==0.28.1
-scikit-image==0.19.1
-scipy==1.13.1
-lipstick==0.0.7
