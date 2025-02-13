@@ -35,33 +35,32 @@ pip install git+https://github.com/sinzlab/laminr.git
 Here's a simple example of how to use **LAMINR** to learn and align invariance manifolds.
 
 ```python
-device = "cuda"
-input_shape = [1, 100, 100] # channels, height, width
+from laminr import neuron_models, get_mei_dict, InvarianceManifold
 
-# Load a trained response-predicting model
-from laminr import neuron_models
+device = "cuda"
+input_shape = [1, 100, 100]  # (channels, height, width)
+
+# Load the trained neuron model
 model = neuron_models.simulated("demo1", img_res=input_shape[1:]).to(device)
 
-# Generate MEIs for the neurons
-from laminr import get_mei_dict
-image_stat_req = {
-  "pixel_value_lower_bound": -1,
-  "pixel_value_upper_bound": 1,
-  "required_img_norm": 1,
+# Generate MEIs (Maximally Exciting Inputs)
+image_constraints = {
+    "pixel_value_lower_bound": -1.0,
+    "pixel_value_upper_bound": 1.0,
+    "required_img_norm": 1.0,
 }
-meis_dict = get_mei_dict(model, input_shape, **image_stat_req)
+meis_dict = get_mei_dict(model, input_shape, **image_constraints)
 
-# initialize the invariance learning and matching pipeline
-from laminr import InvarianceManifold
-inv_manifold = InvarianceManifold(model, meis_dict, **image_stat_req)
+# Initialize the invariance manifold pipeline
+inv_manifold = InvarianceManifold(model, meis_dict, **image_constraints)
 
-# Learn the invariance manifold for neuron 0 (i.e. template manifold)
-template_neuron_idx = 0
-imgs_on_template_manifold, template_neuron_activations = inv_manifold.learn(template_neuron_idx)
+# Learn invariance manifold for neuron 0 (template)
+template_idx = 0
+template_imgs, template_activations = inv_manifold.learn(template_idx)
 
 # Align the template to neurons 1 and 2
-target_neuron_idxs = [1, 2]
-imgs_on_aligned_manifolds, target_neurons_activations = inv_manifold.match(target_neuron_idxs)
+target_idxs = [1, 2]
+aligned_imgs, aligned_activations = inv_manifold.match(target_idxs)
 ```
 
 ## 🛠 Questions & Contributions
