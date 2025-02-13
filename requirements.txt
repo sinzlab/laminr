@@ -1,8 +1,5 @@
 tqdm
 torch==1.13.1
-git+https://github.com/lucabaroni/featurevis_mod@v0.1
-git+https://github.com/sinzlab/nnvision@v0.1.2
-git+https://github.com/sinzlab/neuralpredictors@v0.3.0
 numpy==1.26.4
 huggingface_hub==0.28.1
 scikit-image==0.19.1
