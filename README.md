@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="assets/logo.png" alt="LAMINR Logo" width="100%">
+  <img src="assets/logo.svg" alt="LAMINR Logo" width="100%">
 </div>
 <br>
 
