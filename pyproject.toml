@@ -17,11 +17,11 @@ dependencies = [
     "torch",
     "torchvision",
     "numpy>=1.21,<2.0",
-    "huggingface_hub==0.28.1",
-    "scikit-image==0.19.1",
+    "huggingface_hub>=0.28.1",
+    "scikit-image>=0.19.1",
     "scipy>=1.7",
-    "lipstick==0.0.7",
-    "matplotlib==3.4.3"
+    "lipstick>=0.0.7",
+    "matplotlib>=3.4.3"
 ]
 
 [project.optional-dependencies]
