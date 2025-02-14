@@ -17,7 +17,7 @@
   <img src="https://raw.githubusercontent.com/sinzlab/laminr/main/assets/method.png" alt="Method Overview" width="90%">
 </div>
 
-## 🛠 Installation (still working on it)
+## 🛠 Installation
 
 You can install LAMINR using one of the following methods:
 
