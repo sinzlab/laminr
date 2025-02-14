@@ -62,10 +62,10 @@ class ParamReduceOnPlateau:
         if mode == "min":
             self.op = torch.lt
             self.threshold = -threshold
-            self.best_metric = torch.tensor(1e20)
+            self.best_metric = torch.tensor(float('inf'))
         if mode == "max":
             self.op = torch.gt
-            self.best_metric = -torch.tensor(1e20)
+            self.best_metric = torch.tensor(float('-inf'))
         self.num_epochs_no_improvement = 0
 
     def step(self, metric_to_monitor, value_to_reduce):
