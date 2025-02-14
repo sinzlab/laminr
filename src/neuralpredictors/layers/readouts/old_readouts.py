@@ -1174,7 +1174,7 @@ class DeterministicGaussian2d(nn.Module):
             [
                 torch.linspace(-1, 1, self.in_shape[1]),
                 torch.linspace(-1, 1, self.in_shape[2]),
-            ]
+            ], indexing='ij'
         )
         grid = torch.stack([xx, yy], 2)[None, ...]
         return grid.repeat([self.outdims, 1, 1, 1])

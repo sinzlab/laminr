@@ -31,11 +31,11 @@ class JitteringGridDatamodule:
             + self.sigma / 2
         )
         self.grid = torch.stack(
-            torch.meshgrid(*[grid for _ in range(self.num_invariances)]), -1
+            torch.meshgrid(*[grid for _ in range(self.num_invariances)], indexing='ij'), -1
         ).flatten(0, -2)
         grid0 = torch.linspace(0, 2 * np.pi, self.grid_points_per_dim + 1)[:-1]
         self.grid0 = torch.stack(
-            torch.meshgrid(*[grid0 for _ in range(self.num_invariances)]), -1
+            torch.meshgrid(*[grid0 for _ in range(self.num_invariances)], indexing='ij'), -1
         ).flatten(0, -2)
         self.base_grid = self.grid.repeat(self.steps_per_epoch, 1)
 
