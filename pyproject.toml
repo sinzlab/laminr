@@ -1,11 +1,12 @@
 [build-system]
-requires = ["setuptools>=68.0.0", "wheel"]
+requires = ["setuptools>=61.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "laminr"
-version = "0.0.3"
+version = "0.0.4"
 description = "Learning and Aligning Manifolds using Implicit Neural Representations."
+readme = "README.md"
 authors = [
     {name = "Mohammad Bashiri", email = "mohammadbashiri93@gmail.com"},
     {name = "Luca Baroni", email = "loocabaroni@gmail.com"},
@@ -28,6 +29,12 @@ dependencies = [
 colab = [
     "lipstick>=0.0.7"
 ]
+
+[project.urls]
+Homepage = "https://github.com/sinzlab/laminr"
+Repository = "https://github.com/sinzlab/laminr"
+Documentation = "https://github.com/sinzlab/laminr"
+Issues = "https://github.com/sinzlab/laminr/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]
