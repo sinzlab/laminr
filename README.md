@@ -79,7 +79,7 @@ We have also provided a Dockerfile for building a docker image that has LAMINR a
     - **Builds the Docker image** and creates a container.
     - **Exposes Jupyter Lab** on port **10101**.
 
-3. The jupyter environment opens in the **examples folder**, which you can access by visiting:
+3. Jupyter Lab opens in the **examples folder**, which you can access by visiting:
 [localhost:10101](http://localhost:10101)
 
 
