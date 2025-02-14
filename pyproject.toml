@@ -26,7 +26,7 @@ dependencies = [
 
 [project.optional-dependencies]
 colab = [
-    "lipstick==0.0.7"
+    "lipstick>=0.0.7"
 ]
 
 [tool.setuptools.packages.find]
