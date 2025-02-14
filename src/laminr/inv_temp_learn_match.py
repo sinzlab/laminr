@@ -116,6 +116,7 @@ class InvarianceManifold:
         reg_scale=2,
         requirements=None,
         num_max_epochs=1000,
+        verbose=False,
     ):
         device = next(self.template.parameters()).device
         self.template_neuron_idx = template_neuron_idx
@@ -220,10 +221,13 @@ class InvarianceManifold:
                 if epoch >= (last_scheduling_epoch + additional_epochs):
                     break
             
-            act_desc = f"Activation mean = {acts.mean().item():.2f} (min = {acts.min().item():.2f} std = {acts.std().item():.2f})"
-            cont_desc = f"Contrastive Reg Scale = {reg_scale:.3f}"
-            improve_desc = f"Epochs without improving = {reg_scheduler.num_epochs_no_improvement} (patience = {reg_scheduler.patience})"
-            desc = act_desc + "\n" + cont_desc + "\n" + improve_desc
+            act_desc = f"Act mean = {acts.mean().item():.2f} (min = {acts.min().item():.2f} std = {acts.std().item():.2f})"
+            desc = act_desc
+            if verbose:
+                cont_desc = f"Contrastive Reg Scale = {reg_scale:.3f}"
+                improve_desc = f"Epochs without improving = {reg_scheduler.num_epochs_no_improvement} (patience = {reg_scheduler.patience})"
+                desc = desc + " | " + cont_desc + " | " + improve_desc
+
             pbar.set_description(desc)
 
         self.template.eval()
@@ -262,6 +266,7 @@ class InvarianceManifold:
         uniform_scale_coordinate_transformation=False,
         init_noise_scale_coordinate_transformation=0.1,
         coordinate_transform_clamp_boundaries=True,
+        verbose=False,
     ):
         num_target_neurons = len(target_neuron_idxs)
         self.target_neuron_idxs = target_neuron_idxs
@@ -344,8 +349,10 @@ class InvarianceManifold:
 
             is_increasing = improvement_checker.is_increasing(acts.mean().item())
             act_desc = f"Activation mean = {acts.mean().item():.2f} (min = {acts.min().item():.2f} std = {acts.std().item():.2f})"
-            improve_desc = f"Epochs without improving = {improvement_checker.has_not_improved_counter} (patience: {improvement_checker.patience})"
-            desc = act_desc + "\n" + improve_desc
+            desc = act_desc
+            if verbose:
+                improve_desc = f"Epochs without improving = {improvement_checker.has_not_improved_counter} (patience: {improvement_checker.patience})"
+                desc = desc + " | " + improve_desc
             pbar.set_description(desc)
 
             if not is_increasing:
