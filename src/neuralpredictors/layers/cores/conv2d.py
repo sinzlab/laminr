@@ -1,6 +1,10 @@
 import logging
 import warnings
-from collections import Iterable, OrderedDict
+try:
+    from collections.abc import Iterable, OrderedDict
+except ImportError:
+    from collections import Iterable, OrderedDict
+
 from functools import partial
 
 import torch
