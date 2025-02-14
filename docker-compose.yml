@@ -9,7 +9,32 @@ services:
       dockerfile: ./Dockerfile
     volumes:
       - .:/project
+    working_dir: /project/notebooks
     entrypoint:
       - jupyter
       - lab
       - --allow-root
+
+  examples:
+    image: laminr
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    volumes:
+      - .:/project
+    working_dir: /project/examples
+    entrypoint:
+      - jupyter
+      - lab
+      - --allow-root
+
+  dev:
+    image: laminr
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    volumes:
+      - .:/project
+    working_dir: /project
+    entrypoint:
+      - bash
