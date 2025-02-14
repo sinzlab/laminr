@@ -35,6 +35,9 @@ pip install git+https://github.com/sinzlab/laminr.git
 
 Here's a simple example of how to use **LAMINR** to learn and align invariance manifolds.
 
+[![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/sinzlab/laminr/blob/main/examples/colab_quick_start.ipynb)
+
+
 ```python
 from laminr import neuron_models, get_mei_dict, InvarianceManifold
 
