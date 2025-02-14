@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools", "wheel"]
+requires = ["setuptools>=68.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -11,8 +11,29 @@ authors = [
     {name = "Luca Baroni", email = "loocabaroni@gmail.com"},
 ]
 license = { file = "LICENSE" }
-dependencies = []
+requires-python = ">=3.9"
+dependencies = [
+    "tqdm",
+    "torch",
+    "torchvision",
+    "numpy>=1.21,<2.0",
+    "huggingface_hub==0.28.1",
+    "scikit-image==0.19.1",
+    "scipy>=1.7",
+    "lipstick==0.0.7",
+    "matplotlib==3.4.3"
+]
 
-[tool.setuptools]
-packages = ["laminr"]
-package-dir = { "" = "src" }
+[project.optional-dependencies]
+colab = [
+    "lipstick==0.0.7"
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+filterwarnings = [
+    'ignore::DeprecationWarning',
+]

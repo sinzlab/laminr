@@ -1,15 +1,21 @@
+from collections import OrderedDict
+
+try:
+    from collections.abc import Iterable
+except ImportError:
+    from collections import Iterable
+
+import random
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import numpy as np
-import random
 from neuralpredictors.layers.attention import AttentionConv
 from neuralpredictors.layers.conv import DepthSeparableConv2d
 from neuralpredictors.layers.cores.base import Core
 from neuralpredictors import regularizers
 from neuralpredictors.layers.readouts import PointPooled2d, FullGaussian2d
 from neuralpredictors.utils import get_module_output
-from collections import OrderedDict, Iterable
 
 
 def load_stored(model_class, path, map_location=None):
