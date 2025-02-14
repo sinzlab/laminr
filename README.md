@@ -1,7 +1,8 @@
 <div align="center">
-  <img src="assets/logo.svg" alt="LAMINR Logo" width="100%">
+  <img src="https://raw.githubusercontent.com/sinzlab/laminr/main/assets/logo.svg" alt="LAMINR Logo" width="100%">
 </div>
 <br>
+
 
 **LAMINR** (**L**earning and **A**ligning **M**anifolds of Single-Neuron Invariances using **I**mplicit **N**eural **R**epresentations) enables the **systematic discovery and alignment of invariance manifolds** in stimulus space for visual sensory neurons, providing a principled way to characterize and compare neuronal invariances at the **population level**, independent of nuisance receptive field properties such as position, size, and orientation.
 
@@ -13,7 +14,7 @@
 - **Model-Agnostic:** Can be applied to any robust response-predicting model of biological neurons.
 
 <div align="center">
-  <img src="assets/method.png" alt="Method Overview" width="90%">
+  <img src="https://raw.githubusercontent.com/sinzlab/laminr/main/assets/method.png" alt="Method Overview" width="90%">
 </div>
 
 ## 🛠 Installation (still working on it)
