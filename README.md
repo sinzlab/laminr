@@ -10,7 +10,7 @@
 
 - **Continuous Invariance Manifold Learning:** Identifies the full space of stimuli that elicit near-maximal responses from a neuron.
 - **Alignment Across Neurons:** Learns transformations that align invariance manifolds across neurons, revealing shared invariance properties.
-- **Functional Clustering:** Uncovers distinct functional neuron clusters based on their invariance properties.
+- **Functional Clustering:** Enables clustering neurons into distinct functional types based on their invariance properties.
 - **Model-Agnostic:** Can be applied to any robust response-predicting model of biological neurons.
 
 <div align="center">
