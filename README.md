@@ -68,19 +68,29 @@ aligned_imgs, aligned_activations = inv_manifold.match(target_idxs)
 ```
 
 ## 🐳 Running with Docker
-We have also provided a Dockerfile for building a docker image that has LAMINR already installed. Note that, for this, both `docker` and `docker-compose` should be installed on your system.
+We have provided a Dockerfile for building an image with LAMINR pre-installed. Ensure that both **`docker`** and **`docker-compose`** are installed on your system. 
 
-1. Clone the repository and navigate to the project directory
-2. Run the following command inside the directory
-    ```bash
-    docker-compose run -d -p 10101:8888 examples
-    ```
-    This command:
-    - **Builds the Docker image** and creates a container.
-    - **Exposes Jupyter Lab** on port **10101**.
+Follow the steps below to run **LAMINR** inside a Docker container with **Jupyter Lab**.
 
-3. Jupyter Lab opens in the **examples folder**, which you can access by visiting:
+**1. Clone the repository and navigate to the project directory:**
+```bash
+git clone https://github.com/sinzlab/laminr.git
+cd laminr
+```
+
+**2. Run the following command inside the directory:**
+```bash
+docker-compose run -d -p 10101:8888 examples
+```
+This command:
+- **Builds the Docker image** and creates a container.
+- **Exposes Jupyter Lab** on port **10101**.
+
+**3. Access Jupyter Lab:**
+Jupyter Lab will launch in the **examples folder**, which you can open in your browser via:
 [localhost:10101](http://localhost:10101)
+
+
 
 
 ## 🛠 Questions & Contributions
