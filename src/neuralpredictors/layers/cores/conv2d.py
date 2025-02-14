@@ -1,9 +1,11 @@
 import logging
 import warnings
+from collections import OrderedDict
+
 try:
-    from collections.abc import Iterable, OrderedDict
+    from collections.abc import Iterable
 except ImportError:
-    from collections import Iterable, OrderedDict
+    from collections import Iterable
 
 from functools import partial
 
