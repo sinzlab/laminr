@@ -372,7 +372,8 @@ class InvarianceManifold:
 
         return images_on_aligned_manifolds, target_neurons_activations
 
-    def save_learned_template_as_gif(self, n_images=20, name=None, cmap='Greys_r'):
+    def save_learned_template_as_gif(self, n_images=20, name=None, cmap='Greys_r', fig_kws=None):
+        fig_kws = fig_kws if fig_kws is not None else {}
         images_from_learned_template = self.get_images_from_learned_template(n_images=n_images)
         name = name if name is not None else f"learned_template_{self.template_neuron_idx}"
         with GifMaker(name) as g:
@@ -385,12 +386,13 @@ class InvarianceManifold:
                 g.add(fig)
         return g
     
-    def save_matched_template_as_gif(self, target_neuron_idx, n_images=20, name=None, cmap='Greys_r'):
+    def save_matched_template_as_gif(self, target_neuron_idx, n_images=20, name=None, cmap='Greys_r', fig_kws=None):
+        fig_kws = fig_kws if fig_kws is not None else {}
         images_from_matched_template = self.get_images_from_matched_template(target_neuron_idx, n_images=n_images)
         name = name if name is not None else f"learned_template_{self.template_neuron_idx}_matched_to_{target_neuron_idx}"
         with GifMaker(name) as g:
             for img in images_from_matched_template:
-                fig, ax = plt.subplots()
+                fig, ax = plt.subplots(**fig_kws)
                 vmax = np.abs(img).max()
                 vmin = -vmax
                 ax.imshow(img[0], vmin=vmin, vmax=vmax, cmap=cmap)
