@@ -224,7 +224,7 @@ class InvarianceManifold:
             act_desc = f"Act mean = {acts.mean().item():.2f} (min = {acts.min().item():.2f} std = {acts.std().item():.2f})"
             desc = act_desc
             if verbose:
-                cont_desc = f"Contrastive Reg Scale = {reg_scale:.3f}"
+                cont_desc = f"Contrastive reg scale = {reg_scale:.3f}"
                 improve_desc = f"Epochs without improving = {reg_scheduler.num_epochs_no_improvement} (patience = {reg_scheduler.patience})"
                 desc = desc + " | " + cont_desc + " | " + improve_desc
 
@@ -348,7 +348,7 @@ class InvarianceManifold:
                 optimizer.step()
 
             is_increasing = improvement_checker.is_increasing(acts.mean().item())
-            act_desc = f"Activation mean = {acts.mean().item():.2f} (min = {acts.min().item():.2f} std = {acts.std().item():.2f})"
+            act_desc = f"Activation mean = {acts.mean().item():.2f} (min = {acts.min().item():.2f} max = {acts.max().item():.2f})"
             desc = act_desc
             if verbose:
                 improve_desc = f"Epochs without improving = {improvement_checker.has_not_improved_counter} (patience: {improvement_checker.patience})"
