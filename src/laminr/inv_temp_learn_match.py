@@ -116,6 +116,7 @@ class InvarianceManifold:
         reg_scale=2,
         requirements=None,
         num_max_epochs=1000,
+        verbose=False,
     ):
         device = next(self.template.parameters()).device
         self.template_neuron_idx = template_neuron_idx
@@ -158,9 +159,6 @@ class InvarianceManifold:
             requirements = dict(avg=.99, std=1., necessary_min=0.98)
 
         optimizer = torch.optim.Adam(self.template.func.parameters(), lr=lr)
-        pbar = tqdm(
-            range(num_max_epochs), desc="mean activation will appear after one epoch"
-        )
 
         template_neuron_model = SingleNeuronModel(
             self.response_predicting_model, template_neuron_idx
@@ -171,7 +169,7 @@ class InvarianceManifold:
 
         ignore_scale_scheduler = False
         self.template.train()
-
+        pbar = tqdm(range(num_max_epochs))
         for epoch in pbar:
             for input_grid in dm.train_dataloader():
                 input_grid = input_grid.to(device)
@@ -222,10 +220,15 @@ class InvarianceManifold:
             if ignore_scale_scheduler:
                 if epoch >= (last_scheduling_epoch + additional_epochs):
                     break
+            
+            act_desc = f"Act mean = {acts.mean().item():.2f} (min = {acts.min().item():.2f} std = {acts.std().item():.2f})"
+            desc = act_desc
+            if verbose:
+                cont_desc = f"Contrastive reg scale = {reg_scale:.3f}"
+                improve_desc = f"Epochs without improving = {reg_scheduler.num_epochs_no_improvement} (patience = {reg_scheduler.patience})"
+                desc = desc + " | " + cont_desc + " | " + improve_desc
 
-            pbar.set_description(
-                f"Act: mean = {acts.mean().item():.2f} min = {acts.min().item():.2f} std = {acts.std().item():.2f} | Contrastive Reg Scale = {reg_scale:.3f} | Epochs without improving = {reg_scheduler.num_epochs_no_improvement}, BEST = {reg_scheduler.best_metric:.2f}"
-            )
+            pbar.set_description(desc)
 
         self.template.eval()
 
@@ -263,6 +266,7 @@ class InvarianceManifold:
         uniform_scale_coordinate_transformation=False,
         init_noise_scale_coordinate_transformation=0.1,
         coordinate_transform_clamp_boundaries=True,
+        verbose=False,
     ):
         num_target_neurons = len(target_neuron_idxs)
         self.target_neuron_idxs = target_neuron_idxs
@@ -317,12 +321,10 @@ class InvarianceManifold:
         )
 
         optimizer = torch.optim.Adam(template.coordinate_transform.parameters(), lr=lr)
-        pbar = tqdm(
-            range(num_epochs), desc="mean activation will appear after one epoch"
-        )
         improvement_checker = ImprovementChecker(
             patience=patience, ignore_diff_smaller_than=ignore_diff_smaller_than
         )
+        pbar = tqdm(range(num_epochs))
 
         # Training Loop
         for epoch in pbar:
@@ -346,9 +348,12 @@ class InvarianceManifold:
                 optimizer.step()
 
             is_increasing = improvement_checker.is_increasing(acts.mean().item())
-            pbar.set_description(
-                f"Act = {acts.mean().item():.2f}| # Epochs not improved: {improvement_checker.has_not_improved_counter}/{improvement_checker.patience}"
-            )
+            act_desc = f"Activation mean = {acts.mean().item():.2f} (min = {acts.min().item():.2f} max = {acts.max().item():.2f})"
+            desc = act_desc
+            if verbose:
+                improve_desc = f"Epochs without improving = {improvement_checker.has_not_improved_counter} (patience: {improvement_checker.patience})"
+                desc = desc + " | " + improve_desc
+            pbar.set_description(desc)
 
             if not is_increasing:
                 break
