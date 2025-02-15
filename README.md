@@ -80,7 +80,7 @@ cd laminr
 
 **2. Run the following command inside the directory:**
 ```bash
-docker-compose run -d -p 10101:8888 examples
+docker compose run -d -p 10101:8888 examples
 ```
 This command:
 - **Builds the Docker image** and creates a container.
