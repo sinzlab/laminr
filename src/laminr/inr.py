@@ -25,14 +25,6 @@ class INRTemplates(nn.Module):
         bias=False,
         batchnorm=False,
         weights_scale=1.0,
-        # Coordinate-related arguments
-        # coordinate_transform_clamp_boundaries=True,
-        # only_affine_coordinate_transformation=False,
-        # stochastic_coordinate_transformation=False,
-        # allow_scale_coordinate_transformation=True,
-        # allow_shear_coordinate_transformation=True,
-        # uniform_scale_coordinate_transformation=False,
-        # init_noise_scale_coordinate_transformation=0.1,
         jitter_coords=False,
         jitter_coords_scale=1.0,
     ):
@@ -56,15 +48,6 @@ class INRTemplates(nn.Module):
         )
         self.build_network(widths, nonlinearity, final_nonlinearity, bias)
         self.initialize_buffers()
-        # if num_neurons > 0:
-        #     self.initialize_coordinate_transform(
-        #         only_affine_coordinate_transformation,
-        #         stochastic_coordinate_transformation,
-        #         init_noise_scale_coordinate_transformation,
-        #         allow_scale=allow_scale_coordinate_transformation,
-        #         allow_shear=allow_shear_coordinate_transformation,
-        #         uniform_scale=uniform_scale_coordinate_transformation,
-        #     )
         self.apply(self.weights_init)
 
     def forward(
