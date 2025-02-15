@@ -117,6 +117,7 @@ class InvarianceManifold:
         requirements=None,
         num_max_epochs=1000,
         verbose=False,
+        save_results_every_n_epochs=None,
     ):
         device = next(self.template.parameters()).device
         self.template_neuron_idx = template_neuron_idx
@@ -167,10 +168,20 @@ class InvarianceManifold:
         template_mei_act = self.meis_dict[template_neuron_idx]["activation"]
         template_rf_mask = self.meis_dict[template_neuron_idx]["mask"]
 
+        if save_results_every_n_epochs is not None:
+            images_on_template_manifold_list = []
+            template_neuron_activations_list = []
+
         ignore_scale_scheduler = False
         self.template.train()
         pbar = tqdm(range(num_max_epochs))
         for epoch in pbar:
+
+            if save_results_every_n_epochs and epoch % save_results_every_n_epochs == 0:
+                images_on_template_manifold, template_neuron_activations = self.get_template_images_and_activations(grid, template_neuron_model, gaussian_blur)
+                images_on_template_manifold_list.append(images_on_template_manifold)
+                template_neuron_activations_list.append(template_neuron_activations)
+
             for input_grid in dm.train_dataloader():
                 input_grid = input_grid.to(device)
                 img_pre, img_post, _acts, _ = self.forward(
@@ -229,24 +240,17 @@ class InvarianceManifold:
                 desc = desc + " | " + cont_desc + " | " + improve_desc
 
             pbar.set_description(desc)
-
+                
         self.template.eval()
+        
+        images_on_template_manifold, template_neuron_activations = self.get_template_images_and_activations(grid, template_neuron_model, gaussian_blur)
 
-        with torch.no_grad():
-            img_pre, img_post, _acts, _ = self.forward(
-                grid,
-                self.template,
-                self.img_transforms,
-                template_neuron_model,
-                return_template=True,
-                gb=gaussian_blur,
-            )
-            acts = _acts / template_mei_act
-
-        images_on_template_manifold = img_post.cpu().data.numpy()
-        template_neuron_activations = _acts.squeeze().cpu().data.numpy()
-
-        return images_on_template_manifold, template_neuron_activations
+        if save_results_every_n_epochs is not None:
+            images_on_template_manifold_list.append(images_on_template_manifold)
+            template_neuron_activations_list.append(template_neuron_activations)
+            return np.stack(images_on_template_manifold_list), np.stack(template_neuron_activations_list)
+        else:
+            return images_on_template_manifold, template_neuron_activations
 
     def match(
         self,
@@ -257,7 +261,8 @@ class InvarianceManifold:
         num_epochs=1000,
         patience=15,
         ignore_diff_smaller_than=1e-3,
-        rotate_angle_and_scale=False,
+        initialize_at_rf_positions=True,
+        rotate_angle_and_scale=True,
         find_best_translation=False,
         only_affine_coordinate_transformation=True,
         stochastic_coordinate_transformation=False,
@@ -267,6 +272,7 @@ class InvarianceManifold:
         init_noise_scale_coordinate_transformation=0.1,
         coordinate_transform_clamp_boundaries=True,
         verbose=False,
+        save_results_every_n_epochs=None,
     ):
         num_target_neurons = len(target_neuron_idxs)
         self.target_neuron_idxs = target_neuron_idxs
@@ -294,11 +300,12 @@ class InvarianceManifold:
             uniform_scale=uniform_scale_coordinate_transformation,
             clamp_boundaries=coordinate_transform_clamp_boundaries,
         )
-
-        self.template.register_coords_shifts(
-            torch.from_numpy(template_rf_location).to(device), 
-            torch.from_numpy(others_rf_location).to(device),
-            )
+        
+        if initialize_at_rf_positions:
+            self.template.register_coords_shifts(
+                torch.from_numpy(template_rf_location).to(device), 
+                torch.from_numpy(others_rf_location).to(device),
+                )
 
         dataloader_config = dict(
             num_invariances=1,
@@ -319,15 +326,24 @@ class InvarianceManifold:
             rotate_angle_and_scale=rotate_angle_and_scale,
             find_best_translation=find_best_translation,
         )
+        if save_results_every_n_epochs is not None:
+            images_on_aligned_manifolds_list = []
+            target_neurons_activations_list = []
 
         optimizer = torch.optim.Adam(template.coordinate_transform.parameters(), lr=lr)
         improvement_checker = ImprovementChecker(
             patience=patience, ignore_diff_smaller_than=ignore_diff_smaller_than
         )
         pbar = tqdm(range(num_epochs))
-
+        grid = grid_dataloader.grid.to(device)
         # Training Loop
         for epoch in pbar:
+
+            if save_results_every_n_epochs and epoch % save_results_every_n_epochs == 0:
+                images_on_aligned_manifolds, target_neurons_activations = self.get_matched_images_and_activations(grid, template, other_neurons_loc_in_list, other_neurons_loc_in_model)
+                images_on_aligned_manifolds_list.append(images_on_aligned_manifolds)
+                target_neurons_activations_list.append(target_neurons_activations)
+
             template.train()
             for input_grid in grid_dataloader.train_dataloader():
                 input_grid = input_grid.to(device)
@@ -360,6 +376,31 @@ class InvarianceManifold:
 
         template.eval()
 
+        images_on_aligned_manifolds, target_neurons_activations = self.get_matched_images_and_activations(grid, template, other_neurons_loc_in_list, other_neurons_loc_in_model)
+
+        if save_results_every_n_epochs is not None:
+            images_on_aligned_manifolds_list.append(images_on_aligned_manifolds)
+            target_neurons_activations_list.append(target_neurons_activations)
+            return np.stack(images_on_aligned_manifolds_list), np.stack(target_neurons_activations_list)
+        else:
+            return images_on_aligned_manifolds, target_neurons_activations
+
+
+    def get_template_images_and_activations(self, grid, template_neuron_model, gaussian_blur):  
+        with torch.no_grad():
+            img_pre, img_post, _acts, _ = self.forward(
+                grid,
+                self.template,
+                self.img_transforms,
+                template_neuron_model,
+                return_template=True,
+                gb=gaussian_blur,
+            )
+        images_on_template_manifold = img_post.cpu().data.numpy()
+        template_neuron_activations = _acts.squeeze().cpu().data.numpy()
+        return images_on_template_manifold, template_neuron_activations
+
+    def get_matched_images_and_activations(self, input_grid, template, other_neurons_loc_in_list, other_neurons_loc_in_model):
         with torch.no_grad():
             img_pre, img_post, _acts, _ = self.forward(
                 input_grid,
@@ -371,12 +412,10 @@ class InvarianceManifold:
                 other_neurons_loc_in_model=other_neurons_loc_in_model,
             )
             relevant_acts = _acts[range(len(self.target_neuron_idxs)), :, range(len(self.target_neuron_idxs))]
-
-        images_on_aligned_manifolds = img_post.cpu().data.numpy()
+            images_on_aligned_manifolds = img_post.cpu().data.numpy()
         target_neurons_activations = relevant_acts.cpu().data.numpy()
-
         return images_on_aligned_manifolds, target_neurons_activations
-
+    
     def save_learned_template_as_gif(self, n_images=20, name=None, cmap='Greys_r', fig_kws=None):
         fig_kws = fig_kws if fig_kws is not None else {}
         images_from_learned_template = self.get_images_from_learned_template(n_images=n_images)
@@ -536,8 +575,8 @@ class InvarianceManifold:
         other_neurons_loc_in_model, 
         template_rf_mask=None, 
         others_rf_mask=None, 
-        rotate_angle_and_scale=False,
-        find_best_translation=False
+        rotate_angle_and_scale=True,
+        find_best_translation=True
     ):
         device = next(template.parameters()).device
         if rotate_angle_and_scale:
@@ -548,54 +587,59 @@ class InvarianceManifold:
             mask_size_fraction = torch.from_numpy(mask_size_fraction).to(device)
 
         angles = np.linspace(0, 2*np.pi, int(360/6 + 1))[:-1].astype(np.float32)
-
-        if find_best_translation:
+        
+        if find_best_translation and rotate_angle_and_scale:
             translations = np.linspace(-.1, .1, 11).astype(np.float32)  # Define a range for translations
             desc = 'Finding best angle and translation for initalization'
-        else:
+        elif find_best_translation:
+            translations = np.linspace(-.1, .1, 11).astype(np.float32)  # Define a range for translations
+            desc = 'Finding best translation for initalization'
+        elif rotate_angle_and_scale:
             translations = np.array([0.0]).astype(np.float32)
             desc = 'Finding best angle for initalization'
-
-        # Initialize a 4D array to store activations
-        activations_for_transformations = np.zeros((len(angles), len(translations), len(translations), len(other_neurons_loc_in_list)))
+    
 
         # Try different angles and translations to find the best combination for initialization
-        with torch.no_grad():
-            input_grid = grid_dataloader.grid.to(device)
-            img_posts = []
-            for i, angle in enumerate(tqdm(angles, desc=desc)):
-                for j, tx in enumerate(translations):
-                    for k, ty in enumerate(translations):
-                        template.coordinate_transform.transforms.Affine.angles.data[other_neurons_loc_in_list] =  torch.ones_like(template.coordinate_transform.transforms.Affine.angles.data[other_neurons_loc_in_list]) * angle
-                        if rotate_angle_and_scale:
-                            template.coordinate_transform.transforms.Affine.scalings.data[other_neurons_loc_in_list] = torch.ones_like(template.coordinate_transform.transforms.Affine.scalings.data[other_neurons_loc_in_list]) * 1/mask_size_fraction.reshape(-1, 1)
+        if find_best_translation or rotate_angle_and_scale:
+            # Initialize a 4D array to store activations
+            activations_for_transformations = np.zeros((len(angles), len(translations), len(translations), len(other_neurons_loc_in_list)))
+            with torch.no_grad():
+                input_grid = grid_dataloader.grid.to(device)
+                img_posts = []
+                for i, angle in enumerate(tqdm(angles, desc=desc)):
+                    for j, tx in enumerate(translations):
+                        for k, ty in enumerate(translations):
+                            template.coordinate_transform.transforms.Affine.angles.data[other_neurons_loc_in_list] =  torch.ones_like(template.coordinate_transform.transforms.Affine.angles.data[other_neurons_loc_in_list]) * angle
+                            if rotate_angle_and_scale:
+                                template.coordinate_transform.transforms.Affine.scalings.data[other_neurons_loc_in_list] = torch.ones_like(template.coordinate_transform.transforms.Affine.scalings.data[other_neurons_loc_in_list]) * 1/mask_size_fraction.reshape(-1, 1)
 
-                        template.coordinate_transform.transforms.Affine.translation.data[other_neurons_loc_in_list, 0, 0] = torch.ones_like(template.coordinate_transform.transforms.Affine.translation.data[other_neurons_loc_in_list, 0, 0]) * tx
-                        template.coordinate_transform.transforms.Affine.translation.data[other_neurons_loc_in_list, 0, 1] = torch.ones_like(template.coordinate_transform.transforms.Affine.translation.data[other_neurons_loc_in_list, 0, 1]) * ty
+                            if find_best_translation:
+                                template.coordinate_transform.transforms.Affine.translation.data[other_neurons_loc_in_list, 0, 0] = torch.ones_like(template.coordinate_transform.transforms.Affine.translation.data[other_neurons_loc_in_list, 0, 0]) * tx
+                                template.coordinate_transform.transforms.Affine.translation.data[other_neurons_loc_in_list, 0, 1] = torch.ones_like(template.coordinate_transform.transforms.Affine.translation.data[other_neurons_loc_in_list, 0, 1]) * ty
 
-                        img_pre, img_post, _acts, _ = self.forward(input_grid, template, img_transforms, encoding_model, return_template=False, 
-                                                            other_neurons_loc_in_list=other_neurons_loc_in_list, other_neurons_loc_in_model=other_neurons_loc_in_model)
-                        # relevant_acts = torch.diag(_acts.mean(dim=1)).cpu().data.numpy()  # Get activations for each neuron
-                        relevant_acts = _acts[range(len(self.target_neuron_idxs)), :, range(len(self.target_neuron_idxs))]
-                        relevant_acts = relevant_acts.mean(dim=1).cpu().data.numpy()
+                            img_pre, img_post, _acts, _ = self.forward(input_grid, template, img_transforms, encoding_model, return_template=False, 
+                                                                other_neurons_loc_in_list=other_neurons_loc_in_list, other_neurons_loc_in_model=other_neurons_loc_in_model)
+                            
+                            relevant_acts = _acts[range(len(self.target_neuron_idxs)), :, range(len(self.target_neuron_idxs))]
+                            relevant_acts = relevant_acts.mean(dim=1).cpu().data.numpy()
 
-                        # Store activations in the 4D array
-                        activations_for_transformations[i, j, k, :] = relevant_acts
-                        img_posts.append(img_post.cpu().data.numpy())
+                            # Store activations in the 4D array
+                            activations_for_transformations[i, j, k, :] = relevant_acts
+                            img_posts.append(img_post.cpu().data.numpy())
 
-        # Find the combination of angle, tx, and ty that maximizes the activation for each neuron
-        max_indices = np.argmax(activations_for_transformations.reshape(-1, activations_for_transformations.shape[-1]), axis=0)
-        best_angle_indices, best_tx_indices, best_ty_indices = np.unravel_index(max_indices, activations_for_transformations.shape[:3])
-        best_angles = angles[best_angle_indices]  # Best angles for each neuron
-        best_txs = translations[best_tx_indices]  # Best tx for each neuron
-        best_tys = translations[best_ty_indices]  # Best ty for each neuron
+            # Find the combination of angle, tx, and ty that maximizes the activation for each neuron
+            max_indices = np.argmax(activations_for_transformations.reshape(-1, activations_for_transformations.shape[-1]), axis=0)
+            best_angle_indices, best_tx_indices, best_ty_indices = np.unravel_index(max_indices, activations_for_transformations.shape[:3])
+            best_angles = angles[best_angle_indices]  # Best angles for each neuron
+            best_txs = translations[best_tx_indices]  # Best tx for each neuron
+            best_tys = translations[best_ty_indices]  # Best ty for each neuron
 
-        # Set the optimal angle and translation for each neuron
-        template.coordinate_transform.transforms.Affine.angles.data[other_neurons_loc_in_list] = torch.from_numpy(best_angles).to(device)
-        template.coordinate_transform.transforms.Affine.translation.data[other_neurons_loc_in_list, 0, 0] = torch.from_numpy(best_txs).to(device)
-        template.coordinate_transform.transforms.Affine.translation.data[other_neurons_loc_in_list, 0, 1] = torch.from_numpy(best_tys).to(device)
+            # Set the optimal angle and translation for each neuron
+            template.coordinate_transform.transforms.Affine.angles.data[other_neurons_loc_in_list] = torch.from_numpy(best_angles).to(device)
+            template.coordinate_transform.transforms.Affine.translation.data[other_neurons_loc_in_list, 0, 0] = torch.from_numpy(best_txs).to(device)
+            template.coordinate_transform.transforms.Affine.translation.data[other_neurons_loc_in_list, 0, 1] = torch.from_numpy(best_tys).to(device)
 
-        if rotate_angle_and_scale:
-            template.coordinate_transform.transforms.Affine.scalings.data[other_neurons_loc_in_list] = torch.ones_like(template.coordinate_transform.transforms.Affine.scalings.data[other_neurons_loc_in_list]) * 1/mask_size_fraction.reshape(-1, 1)
+            if rotate_angle_and_scale:
+                template.coordinate_transform.transforms.Affine.scalings.data[other_neurons_loc_in_list] = torch.ones_like(template.coordinate_transform.transforms.Affine.scalings.data[other_neurons_loc_in_list]) * 1/mask_size_fraction.reshape(-1, 1)
             
         return template
