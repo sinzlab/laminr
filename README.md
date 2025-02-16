@@ -1,8 +1,12 @@
 <div align="center">
   <img src="https://raw.githubusercontent.com/sinzlab/laminr/main/assets/logo.svg" alt="LAMINR Logo" width="100%">
-</div>
-<br>
+  &nbsp;
 
+  [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/sinzlab/laminr/blob/main/examples/laminr_quick_start.ipynb)
+  [![PyPI version](https://badge.fury.io/py/laminr.svg)](https://pypi.org/project/laminr/)
+  [![ICLR 2025 Paper](https://img.shields.io/badge/Paper-ICLR%202025_(Oral)-CA3FE6.svg?style=flat)](https://openreview.net/forum?id=kbjJ9ZOakb)
+
+</div>
 
 **LAMINR** (**L**earning and **A**ligning **M**anifolds of Single-Neuron Invariances using **I**mplicit **N**eural **R**epresentations) enables the **systematic discovery and alignment of invariance manifolds** in stimulus space for visual sensory neurons, providing a principled way to characterize and compare neuronal invariances at the **population level**, independent of nuisance receptive field properties such as position, size, and orientation.
 
