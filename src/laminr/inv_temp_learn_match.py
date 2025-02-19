@@ -224,16 +224,18 @@ class InvarianceManifold:
                         )
                         acts = _acts / template_mei_act
                     if check_activity_requirements(acts, requirements):
-                        print("requirements_satisfied")
                         ignore_scale_scheduler = True
                         last_scheduling_epoch = epoch
 
+            act_desc = f"Activation mean = {acts.mean().item():.2f} (min = {acts.min().item():.2f} std = {acts.std().item():.2f})"
+            desc = act_desc
+            
             if ignore_scale_scheduler:
                 if epoch >= (last_scheduling_epoch + additional_epochs):
+                    pbar.set_description("✅ Invariance learning is finished!" + " " + act_desc)
+                    pbar.close()
                     break
             
-            act_desc = f"Act mean = {acts.mean().item():.2f} (min = {acts.min().item():.2f} std = {acts.std().item():.2f})"
-            desc = act_desc
             if verbose:
                 cont_desc = f"Contrastive reg scale = {reg_scale:.3f}"
                 improve_desc = f"Epochs without improving = {reg_scheduler.num_epochs_no_improvement} (patience = {reg_scheduler.patience})"
@@ -366,13 +368,16 @@ class InvarianceManifold:
             is_increasing = improvement_checker.is_increasing(acts.mean().item())
             act_desc = f"Activation mean = {acts.mean().item():.2f} (min = {acts.min().item():.2f} max = {acts.max().item():.2f})"
             desc = act_desc
+
+            if not is_increasing:
+                pbar.set_description("✅ Invariance matching is finished!" + " " + act_desc)
+                pbar.close()
+                break
+
             if verbose:
                 improve_desc = f"Epochs without improving = {improvement_checker.has_not_improved_counter} (patience: {improvement_checker.patience})"
                 desc = desc + " | " + improve_desc
             pbar.set_description(desc)
-
-            if not is_increasing:
-                break
 
         template.eval()
 
