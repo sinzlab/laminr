@@ -84,17 +84,15 @@ cd laminr
 
 **2. Run the following command inside the directory:**
 ```bash
-docker compose run -d -p 10101:8888 examples
+docker compose run -p 10101:8888 examples
 ```
 This command:
 - **Builds the Docker image** and creates a container.
 - **Exposes Jupyter Lab** on port **10101**.
 
 **3. Access Jupyter Lab:**
-Jupyter Lab will launch in the **examples folder**, which you can open in your browser via:
-[localhost:10101](http://localhost:10101)
-
-
+Jupyter Lab will launch in the **examples folder**, which you can open in your browser via
+[localhost:10101](http://localhost:10101) (the token can be found in the terminal logs).
 
 
 ## 🛠 Questions & Contributions

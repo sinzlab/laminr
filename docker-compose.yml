@@ -2,19 +2,6 @@ version: "3.4"
 
 services:
 
-  jupyterlab:
-    image: laminr
-    build:
-      context: ./
-      dockerfile: ./Dockerfile
-    volumes:
-      - .:/project
-    working_dir: /project/notebooks
-    entrypoint:
-      - jupyter
-      - lab
-      - --allow-root
-
   examples:
     image: laminr
     build:
@@ -27,6 +14,25 @@ services:
       - jupyter
       - lab
       - --allow-root
+      - --ip=0.0.0.0
+      - --port=8888
+      - --no-browser
+
+  jupyterlab:
+    image: laminr
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    volumes:
+      - .:/project
+    working_dir: /project/notebooks
+    entrypoint:
+      - jupyter
+      - lab
+      - --allow-root
+      - --ip=0.0.0.0
+      - --port=8888
+      - --no-browser
 
   dev:
     image: laminr
@@ -37,4 +43,9 @@ services:
       - .:/project
     working_dir: /project
     entrypoint:
-      - bash
+      - jupyter
+      - lab
+      - --allow-root
+      - --ip=0.0.0.0
+      - --port=8888
+      - --no-browser

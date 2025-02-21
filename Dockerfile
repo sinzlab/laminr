@@ -1,8 +1,10 @@
-FROM sinzlab/pytorch:v3.9-torch1.9.0-cuda11.1-dj0.12.7
+FROM pytorch/pytorch:2.6.0-cuda12.4-cudnn9-runtime
 
 RUN python -m pip install --upgrade pip
+RUN python -m pip install --no-cache-dir \
+    jupyterlab \
+    ipywidgets
 
-COPY ./jupyter_notebook_config.py /root/.jupyter/
 
 WORKDIR /project
 RUN mkdir /project/src

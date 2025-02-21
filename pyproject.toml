@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "laminr"
-version = "0.0.6"
+version = "0.0.7"
 description = "Learning and Aligning Manifolds using Implicit Neural Representations."
 readme = "README.md"
 authors = [
@@ -17,7 +17,7 @@ dependencies = [
     "tqdm",
     "torch>=1.13.1",
     "torchvision",
-    "numpy>=1.21,<2.0",
+    "numpy>=1.21",
     "huggingface_hub>=0.28.1",
     "scikit-image>=0.19.1",
     "scipy>=1.7",
