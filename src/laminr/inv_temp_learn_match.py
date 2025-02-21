@@ -174,7 +174,7 @@ class InvarianceManifold:
 
         ignore_scale_scheduler = False
         self.template.train()
-        pbar = tqdm(range(num_max_epochs))
+        pbar = tqdm(range(num_max_epochs), bar_format="{l_bar}{bar:20}{r_bar}")
         for epoch in pbar:
 
             if save_results_every_n_epochs and epoch % save_results_every_n_epochs == 0:
@@ -238,7 +238,7 @@ class InvarianceManifold:
             
             if verbose:
                 cont_desc = f"Contrastive reg scale = {reg_scale:.3f}"
-                improve_desc = f"Epochs without improving = {reg_scheduler.num_epochs_no_improvement} (patience = {reg_scheduler.patience})"
+                improve_desc = f"Epochs w/o improving = {reg_scheduler.num_epochs_no_improvement} (patience = {reg_scheduler.patience})"
                 desc = desc + " | " + cont_desc + " | " + improve_desc
 
             pbar.set_description(desc)
@@ -336,7 +336,7 @@ class InvarianceManifold:
         improvement_checker = ImprovementChecker(
             patience=patience, ignore_diff_smaller_than=ignore_diff_smaller_than
         )
-        pbar = tqdm(range(num_epochs))
+        pbar = tqdm(range(num_epochs), bar_format="{l_bar}{bar:20}{r_bar}")
         grid = grid_dataloader.grid.to(device)
         # Training Loop
         for epoch in pbar:
@@ -375,7 +375,7 @@ class InvarianceManifold:
                 break
 
             if verbose:
-                improve_desc = f"Epochs without improving = {improvement_checker.has_not_improved_counter} (patience: {improvement_checker.patience})"
+                improve_desc = f"Epochs w/o improving = {improvement_checker.has_not_improved_counter} (patience: {improvement_checker.patience})"
                 desc = desc + " | " + improve_desc
             pbar.set_description(desc)
 
@@ -611,7 +611,7 @@ class InvarianceManifold:
             with torch.no_grad():
                 input_grid = grid_dataloader.grid.to(device)
                 img_posts = []
-                for i, angle in enumerate(tqdm(angles, desc=desc)):
+                for i, angle in enumerate(tqdm(angles, desc=desc, bar_format="{l_bar}{bar:20}{r_bar}")):
                     for j, tx in enumerate(translations):
                         for k, ty in enumerate(translations):
                             template.coordinate_transform.transforms.Affine.angles.data[other_neurons_loc_in_list] =  torch.ones_like(template.coordinate_transform.transforms.Affine.angles.data[other_neurons_loc_in_list]) * angle
