@@ -5,6 +5,7 @@
   [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/sinzlab/laminr/blob/main/examples/laminr_quick_start.ipynb)
   [![PyPI version](https://badge.fury.io/py/laminr.svg)](https://pypi.org/project/laminr/)
   [![ICLR 2025 Paper](https://img.shields.io/badge/Paper-ICLR%202025_(Oral)-CA3FE6.svg?style=flat)](https://openreview.net/forum?id=kbjJ9ZOakb)
+  [![Talk @ ICLR](https://img.shields.io/badge/Talk-ICLR%202025-D77327.svg?style=flat)](https://youtu.be/psCQ65zjqPc?si=TjOVdUhLTYQ6JeVn)
 
 </div>
 
